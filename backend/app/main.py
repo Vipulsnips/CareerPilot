@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers.resume import router as resume_router
+from app.routers.resume import router as resume_router
 
 app = FastAPI()
 
