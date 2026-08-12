@@ -4,7 +4,8 @@ import json
 from pydantic import ValidationError
 from app.schemas.resume import ResumeSchema
 
-def parse_resume_with_llm(text: str)->ResumeSchema:
+
+def parse_resume_with_llm(text: str) -> ResumeSchema:
     prompt = USER_PROMPT_TEMPLATE.format(text=text)
     response = chat(
         model="llama3.1:8b",
