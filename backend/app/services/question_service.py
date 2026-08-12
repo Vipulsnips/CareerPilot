@@ -6,13 +6,13 @@ from app.schemas.questions import InterviewQuestions
 from app.schemas.interviewConfig import InterviewConfig
 from app.prompts.question_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from pydantic import ValidationError
-
+from app.config.model import LLM_MODEL
 
 def generate_questions(resume: ResumeSchema, analysis: ResumeAnalysis, config:InterviewConfig) -> InterviewQuestions:
     skills = config.skills or resume.skills
     prompt = USER_PROMPT_TEMPLATE.format(resume=resume.model_dump_json(), analysis=analysis.model_dump_json(),question_count=config.question_count,skills=",".join(skills))
     response = chat(
-        model="llama3.1:8b",
+        model=LLM_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},

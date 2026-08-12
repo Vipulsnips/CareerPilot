@@ -4,12 +4,12 @@ from pydantic import ValidationError
 from app.prompts.analysis_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from app.schemas.analysis import ResumeAnalysis
 from app.schemas.resume import ResumeSchema
-
+from app.config.model import LLM_MODEL
 
 def analyse_resume(parsed_resume: ResumeSchema) -> ResumeAnalysis:
     prompt = USER_PROMPT_TEMPLATE.format(text=parsed_resume.model_dump_json())
     response = chat(
-        model="llama3.1:8b",
+        model=LLM_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},

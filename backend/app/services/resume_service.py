@@ -14,10 +14,8 @@ async def process_resume(file: UploadFile):
 
     resume = parse_resume_with_llm(text)
     analysis = analyse_resume(resume)
-    questions = generate_questions(resume, analysis)
 
     return {
         "resume": resume,
         "analysis": analysis,
-        "questions": questions,
     }

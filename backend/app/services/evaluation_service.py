@@ -5,11 +5,12 @@ from pydantic import ValidationError
 from app.schemas.evaluation import AnswerEvaluation
 from app.schemas.resume import ResumeSchema
 from app.schemas.questions import InterviewQuestion
+from app.config.model import LLM_MODEL
 
 def answer_evaluation(resume:ResumeSchema,question:InterviewQuestion,answer:str)->AnswerEvaluation:
   prompt=USER_PROMPT_TEMPLATE.format(resume=resume.model_dump_json(),question=question.model_dump_json(),answer=answer)
   response=chat(
-    model="llama3.1:8b",
+    model=LLM_MODEL,
     messages=[
       {"role": "system","content":SYSTEM_PROMPT},
       {"role": "user","content":prompt}

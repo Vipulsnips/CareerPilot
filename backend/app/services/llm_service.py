@@ -3,12 +3,12 @@ from app.prompts.resume_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 import json
 from pydantic import ValidationError
 from app.schemas.resume import ResumeSchema
-
+from app.config.model import LLM_MODEL
 
 def parse_resume_with_llm(text: str) -> ResumeSchema:
     prompt = USER_PROMPT_TEMPLATE.format(text=text)
     response = chat(
-        model="llama3.1:8b",
+        model=LLM_MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
