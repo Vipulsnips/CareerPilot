@@ -1,12 +1,13 @@
 from ollama import chat
-from app.prompts.resume_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 import json
 from pydantic import ValidationError
+from app.prompts.analysis_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
+from app.schemas.analysis import ResumeAnalysis
 from app.schemas.resume import ResumeSchema
 from app.config.model import LLM_MODEL
 
-def parse_resume_with_llm(text: str) -> ResumeSchema:
-    prompt = USER_PROMPT_TEMPLATE.format(text=text)
+def analyse_resume(parsed_resume: ResumeSchema) -> ResumeAnalysis:
+    prompt = USER_PROMPT_TEMPLATE.format(text=parsed_resume.model_dump_json())
     response = chat(
         model=LLM_MODEL,
         messages=[
@@ -16,15 +17,12 @@ def parse_resume_with_llm(text: str) -> ResumeSchema:
     )
     try:
         content = (
-            response.message.content
-            .replace("```json", "")
-            .replace("```", "")
-            .strip()
+            response.message.content.replace("```json", "").replace("```", "").strip()
         )
         data = json.loads(content)
-        resume = ResumeSchema.model_validate(data)
-        return resume
+        analysis = ResumeAnalysis.model_validate(data)
+        return analysis
     except json.JSONDecodeError:
         raise ValueError("LLM returned invalid JSON")
     except ValidationError:
-        raise ValueError("LLM response does not match ResumeSchema")
+        raise ValueError("LLM response does not match ResumeAnalysis Schema")
