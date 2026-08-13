@@ -14,12 +14,10 @@ def analyse_resume(parsed_resume: ResumeSchema) -> ResumeAnalysis:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ],
+        format="json"
     )
     try:
-        content = (
-            response.message.content.replace("```json", "").replace("```", "").strip()
-        )
-        data = json.loads(content)
+        data = json.loads(response.message.content)
         analysis = ResumeAnalysis.model_validate(data)
         return analysis
     except json.JSONDecodeError:

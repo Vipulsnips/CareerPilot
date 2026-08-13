@@ -13,15 +13,10 @@ def parse_resume_with_llm(text: str) -> ResumeSchema:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ],
+        format="json",
     )
     try:
-        content = (
-            response.message.content
-            .replace("```json", "")
-            .replace("```", "")
-            .strip()
-        )
-        data = json.loads(content)
+        data = json.loads(response.message.content)
         resume = ResumeSchema.model_validate(data)
         return resume
     except json.JSONDecodeError:

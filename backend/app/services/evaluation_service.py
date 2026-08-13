@@ -14,15 +14,11 @@ def answer_evaluation(resume:ResumeSchema,question:InterviewQuestion,answer:str)
     messages=[
       {"role": "system","content":SYSTEM_PROMPT},
       {"role": "user","content":prompt}
-    ])  
+    ],
+    format="json"
+    )  
   try:
-      content = (
-          response.message.content
-          .replace("```json", "")
-          .replace("```", "")
-          .strip()
-      )
-      data = json.loads(content)
+      data = json.loads(response.message.content)
       evaluation = AnswerEvaluation.model_validate(data)
       return evaluation
   except json.JSONDecodeError:
