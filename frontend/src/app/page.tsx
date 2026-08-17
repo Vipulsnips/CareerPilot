@@ -1,6 +1,21 @@
+"use client";
+
+import { useState } from "react";
 import ResumeUpload from "@/components/ResumeUpload";
+import type { Resume, ResumeAnalysis } from "@/types/resume";
 
 export default function Home() {
+  const [resume, setResume] = useState<Resume | null>(null);
+  const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
+
+  const handleUploadSuccess = (
+    uploadedResume: Resume,
+    uploadedAnalysis: ResumeAnalysis,
+  ) => {
+    setResume(uploadedResume);
+    setAnalysis(uploadedAnalysis);
+  };
+
   return (
     <main className="min-h-screen bg-[#F6F7FB] text-[#172033]">
       <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-6 lg:px-10">
@@ -9,6 +24,7 @@ export default function Home() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 text-sm font-bold text-white">
               C
             </div>
+
             <div>
               <h1 className="text-lg font-bold">CareerPilot</h1>
               <p className="text-xs text-slate-500">AI Interview Platform</p>
@@ -19,7 +35,6 @@ export default function Home() {
             V
           </div>
         </header>
-
 
         <section className="flex flex-1 items-center justify-center py-16">
           <div className="w-full max-w-3xl text-center">
@@ -40,10 +55,26 @@ export default function Home() {
               interview tailored to your skills, projects, and experience.
             </p>
 
-            <ResumeUpload />
+            <ResumeUpload onUploadSuccess={handleUploadSuccess} />
+
+            {/* Temporary test */}
+            {resume && analysis && (
+              <div className="mt-6 rounded-2xl bg-white p-6 text-left shadow-sm">
+                <h3 className="font-semibold">
+                  Resume processed successfully!
+                </h3>
+
+                <p className="mt-2 text-sm text-slate-500">
+                  Welcome, {resume.name}
+                </p>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  {analysis.strengths.length} strengths found
+                </p>
+              </div>
+            )}
           </div>
         </section>
-
 
         <footer className="pb-4 text-center text-xs text-slate-400">
           Built for smarter interview preparation
