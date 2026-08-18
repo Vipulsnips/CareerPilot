@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ResumeUpload from "@/components/ResumeUpload";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
+import InterviewConfig from "@/components/InterviewConfig";
 
 export default function Home() {
   const [resume, setResume] = useState<Resume | null>(null);
@@ -57,21 +58,8 @@ export default function Home() {
 
             <ResumeUpload onUploadSuccess={handleUploadSuccess} />
 
-            {/* Temporary test */}
             {resume && analysis && (
-              <div className="mt-6 rounded-2xl bg-white p-6 text-left shadow-sm">
-                <h3 className="font-semibold">
-                  Resume processed successfully!
-                </h3>
-
-                <p className="mt-2 text-sm text-slate-500">
-                  Welcome, {resume.name}
-                </p>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  {analysis.strengths.length} strengths found
-                </p>
-              </div>
+              <InterviewConfig resume={resume} analysis={analysis} />
             )}
           </div>
         </section>
