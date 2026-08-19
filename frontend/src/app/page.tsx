@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import ResumeUpload from "@/components/ResumeUpload";
-import type { Resume, ResumeAnalysis } from "@/types/resume";
 import InterviewConfig from "@/components/InterviewConfig";
+import type { Resume, ResumeAnalysis } from "@/types/resume";
+import type { InterviewQuestions } from "@/types/interview";
 
 export default function Home() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
+  const [questions, setQuestions] = useState<InterviewQuestions | null>(null);
 
   const handleUploadSuccess = (
     uploadedResume: Resume,
@@ -15,6 +17,12 @@ export default function Home() {
   ) => {
     setResume(uploadedResume);
     setAnalysis(uploadedAnalysis);
+  };
+
+  const handleInterviewStart = (
+    generatedQuestions: InterviewQuestions,
+  ) => {
+    setQuestions(generatedQuestions);
   };
 
   return (
@@ -56,10 +64,41 @@ export default function Home() {
               interview tailored to your skills, projects, and experience.
             </p>
 
-            <ResumeUpload onUploadSuccess={handleUploadSuccess} />
+            {!resume && !analysis && (
+              <ResumeUpload onUploadSuccess={handleUploadSuccess} />
+            )}
 
-            {resume && analysis && (
-              <InterviewConfig resume={resume} analysis={analysis} />
+            {resume && analysis && !questions && (
+              <InterviewConfig
+                resume={resume}
+                analysis={analysis}
+                onInterviewStart={handleInterviewStart}
+              />
+            )}
+
+            {questions && (
+              <div className="mx-auto mt-10 max-w-xl rounded-3xl border border-slate-200 bg-white p-8 text-left shadow-sm">
+                <h3 className="text-xl font-bold">
+                  Interview Ready
+                </h3>
+
+                <div className="mt-6 space-y-4">
+                  {questions.questions.map((item, index) => (
+                    <div
+                      key={index}
+                      className="rounded-2xl bg-[#FAFBFF] p-4"
+                    >
+                      <p className="font-semibold text-slate-800">
+                        {index + 1}. {item.question}
+                      </p>
+
+                      <p className="mt-2 text-xs text-slate-500">
+                        {item.category} · {item.difficulty}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </section>

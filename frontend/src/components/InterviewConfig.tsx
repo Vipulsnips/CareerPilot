@@ -2,18 +2,23 @@
 
 import { useState } from "react";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
+import type { InterviewQuestions } from "@/types/interview";
 
 interface InterviewConfigProps {
   resume: Resume;
   analysis: ResumeAnalysis;
+  onInterviewStart: (questions: InterviewQuestions) => void;
 }
 
 export default function InterviewConfig({
   resume,
   analysis,
+  onInterviewStart,
 }: InterviewConfigProps) {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState(5);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills((current) =>
@@ -21,6 +26,43 @@ export default function InterviewConfig({
         ? current.filter((item) => item !== skill)
         : [...current, skill],
     );
+  };
+
+  const handleStartInterview = async () => {
+    if (selectedSkills.length === 0) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/interview/start", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resume,
+          analysis,
+          config: {
+            skills: selectedSkills,
+            question_count: questionCount,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to start interview");
+      }
+
+      const data: InterviewQuestions = await response.json();
+
+      onInterviewStart(data);
+    } catch (error) {
+      console.error("Interview start error:", error);
+      setError("Unable to start the interview. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,7 +78,9 @@ export default function InterviewConfig({
       </div>
 
       <div className="mt-8">
-        <h4 className="text-sm font-semibold text-slate-700">Select skills</h4>
+        <h4 className="text-sm font-semibold text-slate-700">
+          Select skills
+        </h4>
 
         <div className="mt-3 flex flex-wrap gap-2">
           {[...new Set(resume.skills)].map((skill) => (
@@ -67,7 +111,7 @@ export default function InterviewConfig({
             onClick={() =>
               setQuestionCount((current) => Math.max(1, current - 1))
             }
-            disabled={questionCount === 1}
+            disabled={questionCount === 1 || loading}
             className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-lg font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
           >
             −
@@ -82,7 +126,7 @@ export default function InterviewConfig({
             onClick={() =>
               setQuestionCount((current) => Math.min(20, current + 1))
             }
-            disabled={questionCount === 20}
+            disabled={questionCount === 20 || loading}
             className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-lg font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
           >
             +
@@ -102,12 +146,19 @@ export default function InterviewConfig({
         </p>
       </div>
 
+      {error && (
+        <p className="mt-4 text-sm text-red-500">
+          {error}
+        </p>
+      )}
+
       <button
         type="button"
-        disabled={selectedSkills.length === 0}
+        onClick={handleStartInterview}
+        disabled={selectedSkills.length === 0 || loading}
         className="mt-6 w-full rounded-xl bg-[#172033] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Start Interview →
+        {loading ? "Generating Interview..." : "Start Interview →"}
       </button>
     </div>
   );
