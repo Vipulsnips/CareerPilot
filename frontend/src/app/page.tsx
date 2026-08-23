@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ResumeUpload from "@/components/ResumeUpload";
 import InterviewConfig from "@/components/InterviewConfig";
+import InterviewScreen from "@/components/InterviewScreen";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
 import type { InterviewQuestions } from "@/types/interview";
 
@@ -19,9 +20,7 @@ export default function Home() {
     setAnalysis(uploadedAnalysis);
   };
 
-  const handleInterviewStart = (
-    generatedQuestions: InterviewQuestions,
-  ) => {
+  const handleInterviewStart = (generatedQuestions: InterviewQuestions) => {
     setQuestions(generatedQuestions);
   };
 
@@ -76,29 +75,8 @@ export default function Home() {
               />
             )}
 
-            {questions && (
-              <div className="mx-auto mt-10 max-w-xl rounded-3xl border border-slate-200 bg-white p-8 text-left shadow-sm">
-                <h3 className="text-xl font-bold">
-                  Interview Ready
-                </h3>
-
-                <div className="mt-6 space-y-4">
-                  {questions.questions.map((item, index) => (
-                    <div
-                      key={index}
-                      className="rounded-2xl bg-[#FAFBFF] p-4"
-                    >
-                      <p className="font-semibold text-slate-800">
-                        {index + 1}. {item.question}
-                      </p>
-
-                      <p className="mt-2 text-xs text-slate-500">
-                        {item.category} · {item.difficulty}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {resume && questions && (
+              <InterviewScreen resume={resume} questions={questions} />
             )}
           </div>
         </section>
