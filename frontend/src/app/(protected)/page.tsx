@@ -3,8 +3,10 @@
 import { useState } from "react";
 import ResumeUpload from "@/components/ResumeUpload";
 import InterviewConfig from "@/components/InterviewConfig";
+import InterviewScreen from "@/components/InterviewScreen";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
 import type { InterviewQuestions } from "@/types/interview";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   const [resume, setResume] = useState<Resume | null>(null);
@@ -19,9 +21,7 @@ export default function Home() {
     setAnalysis(uploadedAnalysis);
   };
 
-  const handleInterviewStart = (
-    generatedQuestions: InterviewQuestions,
-  ) => {
+  const handleInterviewStart = (generatedQuestions: InterviewQuestions) => {
     setQuestions(generatedQuestions);
   };
 
@@ -40,9 +40,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-semibold shadow-sm ring-1 ring-slate-200">
-            V
-          </div>
+          <UserButton />
         </header>
 
         <section className="flex flex-1 items-center justify-center py-16">
@@ -76,29 +74,8 @@ export default function Home() {
               />
             )}
 
-            {questions && (
-              <div className="mx-auto mt-10 max-w-xl rounded-3xl border border-slate-200 bg-white p-8 text-left shadow-sm">
-                <h3 className="text-xl font-bold">
-                  Interview Ready
-                </h3>
-
-                <div className="mt-6 space-y-4">
-                  {questions.questions.map((item, index) => (
-                    <div
-                      key={index}
-                      className="rounded-2xl bg-[#FAFBFF] p-4"
-                    >
-                      <p className="font-semibold text-slate-800">
-                        {index + 1}. {item.question}
-                      </p>
-
-                      <p className="mt-2 text-xs text-slate-500">
-                        {item.category} · {item.difficulty}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {resume && questions && (
+              <InterviewScreen resume={resume} questions={questions} />
             )}
           </div>
         </section>

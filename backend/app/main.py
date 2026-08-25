@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routers.resume import router as resume_router
 from app.routers.interview import router as interview_router 
+from app.routers.evaluation import router as evaluation_router 
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -15,6 +16,7 @@ app.add_middleware(
     
 app.include_router(resume_router)
 app.include_router(interview_router)
+app.include_router(evaluation_router)
 @app.get('/')
 def root():
     return {"message": "Server Started"}
