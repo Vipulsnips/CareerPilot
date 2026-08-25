@@ -6,6 +6,7 @@ import InterviewConfig from "@/components/InterviewConfig";
 import InterviewScreen from "@/components/InterviewScreen";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
 import type { InterviewQuestions } from "@/types/interview";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   const [resume, setResume] = useState<Resume | null>(null);
@@ -39,9 +40,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-semibold shadow-sm ring-1 ring-slate-200">
-            V
-          </div>
+          <UserButton />
         </header>
 
         <section className="flex flex-1 items-center justify-center py-16">
