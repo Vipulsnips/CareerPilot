@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
 import type { InterviewQuestions } from "@/types/interview";
+import { useAuth } from "@clerk/nextjs";
 
 interface InterviewConfigProps {
   resume: Resume;
@@ -15,6 +16,7 @@ export default function InterviewConfig({
   analysis,
   onInterviewStart,
 }: InterviewConfigProps) {
+  const { getToken } = useAuth();
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState(5);
   const [loading, setLoading] = useState(false);
@@ -35,10 +37,15 @@ export default function InterviewConfig({
     setError(null);
 
     try {
+      const token = await getToken();
+      if (!token) {
+        throw new Error("Unable to authenticate user");
+      }
       const response = await fetch("http://127.0.0.1:8000/interview/start", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization : `Bearer ${token}`
         },
         body: JSON.stringify({
           resume,
@@ -78,9 +85,7 @@ export default function InterviewConfig({
       </div>
 
       <div className="mt-8">
-        <h4 className="text-sm font-semibold text-slate-700">
-          Select skills
-        </h4>
+        <h4 className="text-sm font-semibold text-slate-700">Select skills</h4>
 
         <div className="mt-3 flex flex-wrap gap-2">
           {[...new Set(resume.skills)].map((skill) => (
@@ -146,11 +151,7 @@ export default function InterviewConfig({
         </p>
       </div>
 
-      {error && (
-        <p className="mt-4 text-sm text-red-500">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
       <button
         type="button"

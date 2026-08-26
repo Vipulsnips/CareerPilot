@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import type { Resume, ResumeAnalysis } from "@/types/resume";
+import { useAuth } from "@clerk/nextjs";
 
 interface ResumeUploadProps {
   onUploadSuccess: (resume: Resume, analysis: ResumeAnalysis) => void;
 }
 
 export default function ResumeUpload({ onUploadSuccess }: ResumeUploadProps) {
+  const { getToken } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,10 +23,16 @@ export default function ResumeUpload({ onUploadSuccess }: ResumeUploadProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-
+      const token = await getToken();
+      if (!token) {
+        throw new Error("Unable to authenticate user");
+      }
       const response = await fetch("http://127.0.0.1:8000/resume/upload", {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
