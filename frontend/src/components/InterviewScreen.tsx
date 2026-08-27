@@ -45,7 +45,8 @@ export default function InterviewScreen({
       if (!token) {
         throw new Error("Unable to authenticate user");
       }
-      const response = await fetch("http://127.0.0.1:8000/interview/evaluate", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/interview/evaluate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

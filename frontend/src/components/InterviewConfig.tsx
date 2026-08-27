@@ -41,11 +41,12 @@ export default function InterviewConfig({
       if (!token) {
         throw new Error("Unable to authenticate user");
       }
-      const response = await fetch("http://127.0.0.1:8000/interview/start", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/interview/start`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization : `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           resume,
