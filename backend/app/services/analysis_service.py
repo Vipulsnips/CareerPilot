@@ -1,26 +1,19 @@
-from ollama import chat
-import json
 from pydantic import ValidationError
+
 from app.prompts.analysis_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from app.schemas.analysis import ResumeAnalysis
 from app.schemas.resume import ResumeSchema
-from app.config.model import LLM_MODEL
+from app.services.gemini_service import generate_structured_response
+
 
 def analyse_resume(parsed_resume: ResumeSchema) -> ResumeAnalysis:
     prompt = USER_PROMPT_TEMPLATE.format(text=parsed_resume.model_dump_json())
-    response = chat(
-        model=LLM_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
-        ],
-        format="json"
-    )
+
     try:
-        data = json.loads(response.message.content)
-        analysis = ResumeAnalysis.model_validate(data)
-        return analysis
-    except json.JSONDecodeError:
-        raise ValueError("LLM returned invalid JSON")
+        return generate_structured_response(
+            system_prompt=SYSTEM_PROMPT,
+            user_prompt=prompt,
+            response_schema=ResumeAnalysis,
+        )
     except ValidationError:
         raise ValueError("LLM response does not match ResumeAnalysis Schema")

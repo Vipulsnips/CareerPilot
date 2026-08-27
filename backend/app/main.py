@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,7 +9,6 @@ from app.routers.resume import router as resume_router
 from app.routers.interview import router as interview_router 
 from app.routers.evaluation import router as evaluation_router 
 
-load_dotenv()
 
 app = FastAPI()
 

@@ -1,1 +1,3 @@
-LLM_MODEL = "llama3.1:8b"
+import os
+
+LLM_MODEL = os.environ["LLM_MODEL"]
