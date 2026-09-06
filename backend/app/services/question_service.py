@@ -1,5 +1,3 @@
-from pydantic import ValidationError
-
 from app.schemas.resume import ResumeSchema
 from app.schemas.analysis import ResumeAnalysis
 from app.schemas.questions import InterviewQuestions
@@ -21,12 +19,8 @@ def generate_questions(
         question_count=config.question_count,
         skills=",".join(skills),
     )
-
-    try:
-        return generate_structured_response(
-            system_prompt=SYSTEM_PROMPT,
-            user_prompt=prompt,
-            response_schema=InterviewQuestions,
-        )
-    except ValidationError:
-        raise ValueError("LLM response does not match InterviewQuestions Schema")
+    return generate_structured_response(
+        system_prompt=SYSTEM_PROMPT,
+        user_prompt=prompt,
+        response_schema=InterviewQuestions,
+    )

@@ -1,5 +1,3 @@
-from pydantic import ValidationError
-
 from app.prompts.evaluation_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from app.schemas.evaluation import AnswerEvaluation
 from app.schemas.resume import ResumeSchema
@@ -18,14 +16,8 @@ def answer_evaluation(
         question=question.model_dump_json(),
         answer=answer,
     )
-
-    try:
-        return generate_structured_response(
-            system_prompt=SYSTEM_PROMPT,
-            user_prompt=prompt,
-            response_schema=AnswerEvaluation,
-        )
-    except ValidationError:
-        raise ValueError(
-            "LLM response does not match AnswerEvaluation schema"
-        )
+    return generate_structured_response(
+        system_prompt=SYSTEM_PROMPT,
+        user_prompt=prompt,
+        response_schema=AnswerEvaluation,
+    )
