@@ -1,4 +1,3 @@
-
 from app.prompts.resume_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from app.schemas.resume import ResumeSchema
 from app.services.gemini_service import generate_structured_response

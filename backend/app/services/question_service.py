@@ -4,6 +4,7 @@ from app.schemas.questions import InterviewQuestions
 from app.schemas.interviewConfig import InterviewConfig
 from app.prompts.question_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from app.services.gemini_service import generate_structured_response
+from app.logging_config import logger
 
 
 def generate_questions(
@@ -11,6 +12,11 @@ def generate_questions(
     analysis: ResumeAnalysis,
     config: InterviewConfig,
 ) -> InterviewQuestions:
+    logger.info(
+        "Interview question generation started",
+        extra={"event": "interview_question_generation_started"},
+    )
+
     skills = config.skills or resume.skills
 
     prompt = USER_PROMPT_TEMPLATE.format(
@@ -19,8 +25,16 @@ def generate_questions(
         question_count=config.question_count,
         skills=",".join(skills),
     )
-    return generate_structured_response(
+
+    result = generate_structured_response(
         system_prompt=SYSTEM_PROMPT,
         user_prompt=prompt,
         response_schema=InterviewQuestions,
     )
+
+    logger.info(
+        "Interview question generation completed",
+        extra={"event": "interview_question_generation_completed"},
+    )
+
+    return result

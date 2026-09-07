@@ -10,7 +10,7 @@ from app.exceptions import GeminiServiceError, LLMResponseValidationError
 from app.routers.resume import router as resume_router
 from app.routers.interview import router as interview_router
 from app.routers.evaluation import router as evaluation_router
-
+from app.logging_config import logger
 
 app = FastAPI()
 
@@ -20,6 +20,11 @@ async def gemini_service_error_handler(
     request: Request,
     exc: GeminiServiceError,
 ):
+    logger.exception(
+        "Gemini service error",
+        extra={"event": "gemini_service_error"},
+    )
+
     return JSONResponse(
         status_code=503,
         content={"detail": "AI service temporarily unavailable"},
@@ -31,6 +36,11 @@ async def llm_response_validation_error_handler(
     request: Request,
     exc: LLMResponseValidationError,
 ):
+    logger.exception(
+        "LLM response validation failed",
+        extra={"event": "llm_response_validation_error"},
+    )
+
     return JSONResponse(
         status_code=500,
         content={"detail": "AI response could not be processed"},

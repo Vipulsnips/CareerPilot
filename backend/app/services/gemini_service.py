@@ -12,7 +12,7 @@ from app.exceptions import GeminiServiceError, LLMResponseValidationError
 client = genai.Client(
     http_options=types.HttpOptions(
         timeout=30_000,
-        retry_options=types.HttpRetryOptions(   
+        retry_options=types.HttpRetryOptions(
             attempts=3,
             initial_delay=1,
             max_delay=4,
