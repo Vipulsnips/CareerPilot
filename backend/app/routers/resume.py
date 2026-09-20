@@ -12,4 +12,9 @@ async def upload_resume(
     file: UploadFile = File(...),
     auth_state=Depends(require_auth),
 ):
-    return await process_resume(file)
+    user_id = auth_state.payload["sub"]
+
+    return await process_resume(
+        file=file,
+        user_id=user_id,
+    )

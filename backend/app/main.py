@@ -11,6 +11,7 @@ from app.routers.resume import router as resume_router
 from app.routers.interview import router as interview_router
 from app.routers.evaluation import router as evaluation_router
 from app.logging_config import logger
+from app.routers.rag import router as rag_router
 
 app = FastAPI()
 
@@ -58,6 +59,7 @@ app.add_middleware(
 app.include_router(resume_router)
 app.include_router(interview_router)
 app.include_router(evaluation_router)
+app.include_router(rag_router)
 
 
 @app.get("/")
