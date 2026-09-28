@@ -4,6 +4,7 @@ from app.auth import require_auth
 from app.schemas.rag import RAGAnswer
 from app.schemas.rag_request import RAGQuestionRequest
 from app.services.rag.rag_service import answer_question
+from app.services.tools.tool_calling_service import run_tool_calling
 
 
 router = APIRouter(prefix="/rag", tags=["rag"])
@@ -16,7 +17,7 @@ async def ask_question(
 ):
     user_id = auth_state.payload["sub"]
 
-    return answer_question(
+    return run_tool_calling(
         question=request.question,
         user_id=user_id,
     )
