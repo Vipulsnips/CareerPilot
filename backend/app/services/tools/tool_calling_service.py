@@ -1,9 +1,8 @@
 from google.genai import types
 
 from app.config.model import LLM_MODEL
-from app.prompts.rag_prompt import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 from app.schemas.rag import RAGAnswer
-from app.services.gemini_service import client, generate_structured_response
+from app.services.gemini_service import client
 from app.services.tools.resume_tools import search_resume
 from app.services.tools.tool_definitions import search_resume_tool
 
@@ -42,44 +41,72 @@ def run_tool_calling(
         tools=[search_resume_tool],
     )
 
-    response = client.models.generate_content(
-        model=LLM_MODEL,
-        contents=contents,
-        config=config,
-    )
+    max_iterations = 3
 
-    function_calls = [
-        part.function_call
-        for part in response.candidates[0].content.parts
-        if part.function_call
-    ]
+    for _ in range(max_iterations):
 
-    if not function_calls:
-        return RAGAnswer(
-            answer=response.text or "I couldn't generate an answer for that question."
+        response = client.models.generate_content(
+            model=LLM_MODEL,
+            contents=contents,
+            config=config,
         )
 
-    function_call = function_calls[0]
+        function_calls = [
+            part.function_call
+            for part in response.candidates[0].content.parts
+            if part.function_call
+        ]
 
-    if function_call.name != "search_resume":
-        raise ValueError(f"Unknown tool: {function_call.name}")
+        if not function_calls:
+            return RAGAnswer(
+                answer=response.text
+                or "I couldn't generate an answer for that question."
+            )
 
-    query = function_call.args["query"]
+        contents.append(
+            response.candidates[0].content
+        )
 
-    documents = search_resume(
-        query=query,
-        user_id=user_id,
-    )
+        function_response_parts = []
 
-    context = "\n\n".join(document["content"] for document in documents)
+        for function_call in function_calls:
 
-    prompt = USER_PROMPT_TEMPLATE.format(
-        context=context,
-        question=question,
-    )
+            if function_call.name != "search_resume":
+                raise ValueError(
+                    f"Unknown tool: {function_call.name}"
+                )
 
-    return generate_structured_response(
-        system_prompt=SYSTEM_PROMPT,
-        user_prompt=prompt,
-        response_schema=RAGAnswer,
+            query = function_call.args["query"]
+
+            documents = search_resume(
+                query=query,
+                user_id=user_id,
+            )
+
+            function_response = types.FunctionResponse(
+                name=function_call.name,
+                response={
+                    "result": documents,
+                },
+                id=function_call.id,
+            )
+
+            function_response_parts.append(
+                types.Part(
+                    function_response=function_response,
+                )
+            )
+
+        contents.append(
+            types.Content(
+                role="user",
+                parts=function_response_parts,
+            )
+        )
+
+    return RAGAnswer(
+        answer=(
+            "I couldn't gather enough information "
+            "from your resume to answer that."
+        )
     )
