@@ -6,6 +6,7 @@ from app.services.analysis_service import analyse_resume
 from app.logging_config import logger
 from app.services.rag.ingestion_service import index_resume
 
+
 async def process_resume(
     file: UploadFile,
     user_id: str,
@@ -16,8 +17,11 @@ async def process_resume(
     )
 
     text = await extract_text(file)
-    index_resume(text=text,user_id=user_id)
     resume = parse_resume_with_llm(text)
+    index_resume(
+        resume=resume,
+        user_id=user_id,
+    )
     analysis = analyse_resume(resume)
 
     logger.info(

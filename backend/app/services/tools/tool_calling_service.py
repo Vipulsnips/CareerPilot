@@ -75,12 +75,15 @@ def run_tool_calling(
                 raise ValueError(
                     f"Unknown tool: {function_call.name}"
                 )
-
             query = function_call.args["query"]
+            section = function_call.args.get("section")
+            item = function_call.args.get("item")
 
             documents = search_resume(
                 query=query,
                 user_id=user_id,
+                section=section,
+                item=item,
             )
 
             function_response = types.FunctionResponse(

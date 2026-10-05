@@ -6,14 +6,29 @@ from app.services.rag.vector_store_service import vector_store
 def retrieve_documents(
     query: str,
     user_id: str,
+    section: str | None = None,
+    item: str | None = None,
 ) -> list[Document]:
+    filters = [
+        {"user_id": user_id},
+    ]
+    if section:
+        filters.append({"section": section})
+    if item:
+        filters.append({"item": item})
+    if len(filters) == 1:
+        metadata_filter = filters[0]
+    else:
+        metadata_filter = {
+            "$and": filters,
+        }
     retriever = vector_store.as_retriever(
         search_type="mmr",
         search_kwargs={
             "k": 6,
             "fetch_k": 20,
             "lambda_mult": 0.5,
-            "filter": {"user_id": user_id},
+            "filter": metadata_filter,
         },
     )
 
