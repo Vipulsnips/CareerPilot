@@ -23,11 +23,9 @@ def retrieve_documents(
             "$and": filters,
         }
     retriever = vector_store.as_retriever(
-        search_type="mmr",
+        search_type="similarity",
         search_kwargs={
             "k": 6,
-            "fetch_k": 20,
-            "lambda_mult": 0.5,
             "filter": metadata_filter,
         },
     )
@@ -45,3 +43,34 @@ def retrieve_documents(
         unique_documents.append(document)
 
     return unique_documents
+
+def retrieve_section_documents(
+    user_id: str,
+    section: str,
+) -> list[Document]:
+
+    results = vector_store.get(
+        where={
+            "$and": [
+                {"user_id": user_id},
+                {"source": "resume"},
+                {"section": section},
+            ]
+        },
+        include=["documents", "metadatas"],
+    )
+
+    documents: list[Document] = []
+
+    for content, metadata in zip(
+        results["documents"],
+        results["metadatas"],
+    ):
+        documents.append(
+            Document(
+                page_content=content,
+                metadata=metadata,
+            )
+        )
+
+    return documents
