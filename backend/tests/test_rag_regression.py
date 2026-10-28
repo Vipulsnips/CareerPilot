@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.services.tools.tool_calling_service import run_tool_calling
+from app.services.agent_graph import run_agent
 
 
 TEST_USER_ID = os.getenv("RAG_TEST_USER_ID")
@@ -53,7 +53,7 @@ TEST_USER_ID = os.getenv("RAG_TEST_USER_ID")
     ],
 )
 def test_rag_regression(question: str, expected: list[str]):
-    result = run_tool_calling(
+    result = run_agent(
         question=question,
         user_id=TEST_USER_ID,
     )

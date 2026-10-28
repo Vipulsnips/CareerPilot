@@ -3,8 +3,7 @@ from fastapi import APIRouter, Depends
 from app.auth import require_auth
 from app.schemas.rag import RAGAnswer
 from app.schemas.rag_request import RAGQuestionRequest
-from app.services.rag.rag_service import answer_question
-from app.services.tools.tool_calling_service import run_tool_calling
+from app.services.agent_graph import run_agent
 
 
 router = APIRouter(prefix="/rag", tags=["rag"])
@@ -17,7 +16,7 @@ async def ask_question(
 ):
     user_id = auth_state.payload["sub"]
 
-    return run_tool_calling(
+    return run_agent(
         question=request.question,
         user_id=user_id,
     )
