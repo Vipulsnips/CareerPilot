@@ -6,9 +6,9 @@ from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from app.config.model import LLM_MODEL
+from app.logging_config import logger
 from app.services.agent_state import AgentState
 from app.services.tools.resume_tools import search_resume
-
 
 MAX_MODEL_CALLS = 4
 
@@ -69,16 +69,31 @@ def run_resume_tool(state: AgentState) -> dict:
 
         args = call["args"]
 
-        documents = search_resume(
-            query=args.get("query", ""),
-            user_id=state["user_id"],
-            section=args.get("section"),
-            item=args.get("item"),
-        )
+        try:
+            documents = search_resume(
+                query=args.get("query", ""),
+                user_id=state["user_id"],
+                section=args.get("section"),
+                item=args.get("item"),
+            )
+
+            content = json.dumps(documents)
+
+        except Exception:
+            logger.exception(
+                "Resume search failed",
+                extra={"event": "resume_search_failed"},
+            )
+
+            content = (
+                "Resume search is temporarily unavailable. "
+                "Do not invent an answer. Inform the user that "
+                "their resume information could not be retrieved."
+            )
 
         results.append(
             ToolMessage(
-                content=json.dumps(documents),
+                content=content,
                 tool_call_id=call["id"],
                 name=call["name"],
             )
